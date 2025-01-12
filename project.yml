@@ -5,20 +5,20 @@ attributes:
 configs:
   Debug: debug
   Release: release
-name: Bucketeer
+name: BucketeerOpenFeatureProvider
 options:
   defaultConfig: Release
   groupSortPosition: bottom
   transitivelyLinkDependencies: false
 schemes:
-  Bucketeer:
+  BucketeerOpenFeature:
     analyze:
       config: Debug
     archive:
       config: Release
     build:
       targets:
-        Bucketeer:
+        BucketeerOpenFeature:
         - running
         - testing
         - profiling
@@ -36,7 +36,7 @@ schemes:
       - value: $(E2E_API_KEY)
         variable: E2E_API_KEY
       targets:
-      - BucketeerTests
+      - BucketeerOpenFeatureTests
   Example:
     analyze:
       config: Debug
@@ -45,44 +45,6 @@ schemes:
     build:
       targets:
         Example:
-        - running
-        - testing
-        - profiling
-        - analyzing
-        - archiving
-    profile:
-      config: Release
-    run:
-      config: Debug
-    test:
-      config: Debug
-  ExampleSwiftUI:
-    analyze:
-      config: Debug
-    archive:
-      config: Release
-    build:
-      targets:
-        ExampleSwiftUI:
-        - running
-        - testing
-        - profiling
-        - analyzing
-        - archiving
-    profile:
-      config: Release
-    run:
-      config: Debug
-    test:
-      config: Debug
-  ExampleTVOS:
-    analyze:
-      config: Debug
-    archive:
-      config: Release
-    build:
-      targets:
-        ExampleTVOS:
         - running
         - testing
         - profiling
@@ -117,11 +79,19 @@ settings:
       VERSION_INFO_PREFIX: ''
       VALIDATE_PRODUCT: 'YES'
 packages:
-  Firebase:
-    url: https://github.com/firebase/firebase-ios-sdk
-    from: 11.1.0
-targets:
   Bucketeer:
+    url: https://github.com/bucketeer-io/ios-client-sdk
+    from: 2.2.1
+  OpenFeature:
+    url: https://github.com/open-feature/swift-sdk
+    from: 0.2.1
+targets:
+  BucketeerOpenFeature:
+    dependencies:
+    - package: Bucketeer
+      product: Bucketeer
+    - package: OpenFeature
+      product: OpenFeature
     platform: iOS
     postbuildScripts:
     - name: Run Script(linter)
@@ -135,7 +105,7 @@ targets:
         mint >/dev/null; then\n  make run-lint\nelse\n  echo \"Warning: Mint is not
         installed. Please run make install-mint.\"\nfi\n"
       shell: /bin/sh
-    productName: Bucketeer
+    productName: BucketeerOpenFeature
     settings:
       configs:
         Debug:
@@ -143,48 +113,48 @@ targets:
           BUILD_LIBRARY_FOR_DISTRIBUTION: 'YES'
           CLANG_CXX_LANGUAGE_STANDARD: gnu++17
           CODE_SIGN_STYLE: Automatic
-          INFOPLIST_FILE: Bucketeer/Info.plist
-          IPHONEOS_DEPLOYMENT_TARGET: '11.0'
+          INFOPLIST_FILE: BucketeerOpenFeature/Info.plist
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
           IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]: '13.1'
           MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
           MTL_FAST_MATH: 'YES'
-          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.openfeature.provider
           SUPPORTED_PLATFORMS: appletvos appletvsimulator iphoneos iphonesimulator
           SUPPORTS_MACCATALYST: 'YES'
           SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: 'YES'
           SWIFT_EMIT_LOC_STRINGS: 'YES'
           SWIFT_VERSION: '5.0'
           TARGETED_DEVICE_FAMILY: 1,2,3
-          TVOS_DEPLOYMENT_TARGET: '11.0'
+          TVOS_DEPLOYMENT_TARGET: '14.0'
           LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
         Release:
           CODE_SIGN_IDENTITY: iOS Developer
           BUILD_LIBRARY_FOR_DISTRIBUTION: 'YES'
           CLANG_CXX_LANGUAGE_STANDARD: gnu++17
           CODE_SIGN_STYLE: Automatic
-          INFOPLIST_FILE: Bucketeer/Info.plist
-          IPHONEOS_DEPLOYMENT_TARGET: '11.0'
+          INFOPLIST_FILE: BucketeerOpenFeature/Info.plist
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
           IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]: '13.1'
           MTL_FAST_MATH: 'YES'
-          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.openfeature.provider
           SUPPORTED_PLATFORMS: appletvos appletvsimulator iphoneos iphonesimulator
           SUPPORTS_MACCATALYST: 'YES'
           SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: 'YES'
           SWIFT_EMIT_LOC_STRINGS: 'YES'
           SWIFT_VERSION: '5.0'
           TARGETED_DEVICE_FAMILY: 1,2,3
-          TVOS_DEPLOYMENT_TARGET: '11.0'
+          TVOS_DEPLOYMENT_TARGET: '14.0'
           LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
     sources:
-    - name: Bucketeer
-      path: Bucketeer
+    - name: BucketeerOpenFeature
+      path: BucketeerOpenFeature
     type: framework
-  BucketeerTests:
+  BucketeerOpenFeatureTests:
     dependencies:
-    - target: Bucketeer
+    - target: BucketeerOpenFeature
       embed: false
     platform: iOS
-    productName: BucketeerTests
+    productName: BucketeerOpenFeatureTests
     settings:
       configs:
         Debug:
@@ -215,8 +185,8 @@ targets:
           SWIFT_EMIT_LOC_STRINGS: 'NO'
           SWIFT_VERSION: '5.0'
     sources:
-    - name: BucketeerTests
-      path: BucketeerTests
+    - name: BucketeerOpenFeatureTests
+      path: BucketeerOpenFeatureTests
     type: bundle.unit-test
   Example:
     entitlements:
@@ -224,9 +194,7 @@ targets:
       properties:
         aps-environment: development
     dependencies:
-    - target: Bucketeer
-    - package: Firebase
-      product: FirebaseMessaging
+    - target: BucketeerOpenFeature
     platform: iOS
     configFiles:
       Debug: environment.xcconfig
@@ -246,7 +214,7 @@ targets:
           INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
             UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft
             UIInterfaceOrientationLandscapeRight
-          IPHONEOS_DEPLOYMENT_TARGET: '11.0'
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
           MTL_ENABLE_DEBUG_INFO: 'YES'
           PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.example
           PROVISIONING_PROFILE_SPECIFIER: ''
@@ -265,111 +233,11 @@ targets:
           INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
             UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft
             UIInterfaceOrientationLandscapeRight
-          IPHONEOS_DEPLOYMENT_TARGET: '11.0'
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
           PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.example
           PROVISIONING_PROFILE_SPECIFIER: ''
           SWIFT_VERSION: '5.0'
     sources:
     - name: Example
       path: Example
-    type: application
-  ExampleSwiftUI:
-    dependencies:
-    - target: Bucketeer
-    platform: iOS
-    configFiles:
-      Debug: environment.xcconfig
-    productName: ExampleSwiftUI
-    settings:
-      configs:
-        Debug:
-          ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-          CLANG_CXX_LANGUAGE_STANDARD: gnu++20
-          CODE_SIGN_STYLE: Automatic
-          CURRENT_PROJECT_VERSION: '1'
-          DEVELOPMENT_ASSET_PATHS: '"ExampleSwiftUI/Preview Content"'
-          GENERATE_INFOPLIST_FILE: 'YES'
-          INFOPLIST_FILE: ExampleSwiftUI/Info.plist
-          INFOPLIST_KEY_UIApplicationSceneManifest_Generation: 'YES'
-          INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: 'YES'
-          INFOPLIST_KEY_UILaunchScreen_Generation: 'YES'
-          INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationLandscapeLeft
-            UIInterfaceOrientationPortrait
-          INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationLandscapeLeft
-            UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown
-          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
-          MARKETING_VERSION: '1.0'
-          MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
-          MTL_FAST_MATH: 'YES'
-          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.ExampleSwiftUI
-          SWIFT_EMIT_LOC_STRINGS: 'YES'
-          SWIFT_VERSION: '5.0'
-          ENABLE_PREVIEWS: 'YES'
-        Release:
-          ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-          CLANG_CXX_LANGUAGE_STANDARD: gnu++20
-          CODE_SIGN_STYLE: Automatic
-          CURRENT_PROJECT_VERSION: '1'
-          DEVELOPMENT_ASSET_PATHS: '"ExampleSwiftUI/Preview Content"'
-          GENERATE_INFOPLIST_FILE: 'YES'
-          INFOPLIST_FILE: ExampleSwiftUI/Info.plist
-          INFOPLIST_KEY_UIApplicationSceneManifest_Generation: 'YES'
-          INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: 'YES'
-          INFOPLIST_KEY_UILaunchScreen_Generation: 'YES'
-          INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationLandscapeLeft
-            UIInterfaceOrientationPortrait
-          INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationLandscapeLeft
-            UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown
-          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
-          MARKETING_VERSION: '1.0'
-          MTL_FAST_MATH: 'YES'
-          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.ExampleSwiftUI
-          SWIFT_EMIT_LOC_STRINGS: 'YES'
-          SWIFT_VERSION: '5.0'
-          ENABLE_PREVIEWS: 'YES'
-    sources:
-    - name: ExampleSwiftUI
-      path: ExampleSwiftUI
-    type: application
-  ExampleTVOS:
-    dependencies:
-    - target: Bucketeer
-      embed: false
-    platform: iOS
-    configFiles:
-      Debug: environment.xcconfig
-    settings:
-      configs:
-        Debug:
-          ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
-          CODE_SIGN_STYLE: Automatic
-          DEVELOPMENT_ASSET_PATHS: '"ExampleTVOS/Preview Content"'
-          GENERATE_INFOPLIST_FILE: 'YES'
-          INFOPLIST_FILE: ExampleTVOS/Info.plist
-          INFOPLIST_KEY_LSApplicationCategoryType: ''
-          MARKETING_VERSION: 0.0.1
-          MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
-          MTL_FAST_MATH: 'YES'
-          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.tvos.example
-          SDKROOT: appletvos
-          SWIFT_VERSION: '5.0'
-          TARGETED_DEVICE_FAMILY: '3'
-          TVOS_DEPLOYMENT_TARGET: '11.0'
-        Release:
-          ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
-          CODE_SIGN_STYLE: Automatic
-          DEVELOPMENT_ASSET_PATHS: '"ExampleTVOS/Preview Content"'
-          GENERATE_INFOPLIST_FILE: 'YES'
-          INFOPLIST_FILE: ExampleTVOS/Info.plist
-          INFOPLIST_KEY_LSApplicationCategoryType: ''
-          MARKETING_VERSION: 0.0.1
-          MTL_FAST_MATH: 'YES'
-          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.tvos.example
-          SDKROOT: appletvos
-          SWIFT_VERSION: '5.0'
-          TARGETED_DEVICE_FAMILY: '3'
-          TVOS_DEPLOYMENT_TARGET: '11.0'
-    sources:
-    - name: ExampleTVOS
-      path: ExampleTVOS
     type: application
