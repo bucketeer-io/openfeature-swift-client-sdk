@@ -31,7 +31,6 @@ extension BKTEvaluationDetails where T == Int {
     }
 }
 
-
 extension BKTValue {
     func toOpenFeatureValue() -> Value {
         switch self {

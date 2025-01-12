@@ -6,10 +6,10 @@ class BucketeerProvider: FeatureProvider {
     private let eventHandler = EventHandler(ProviderEvent.notReady)
     var hooks: [any Hook] = []
     var metadata: ProviderMetadata = Metadata()
-    
+
     private let config: BKTConfig
     private let user: BKTUser
-    
+
     public init(
         config: BKTConfig,
         user: BKTUser
@@ -17,7 +17,7 @@ class BucketeerProvider: FeatureProvider {
         self.config = config
         self.user = user
     }
-    
+
     /// Called by OpenFeatureAPI whenever the new Provider is registered
     func initialize(initialContext: (any EvaluationContext)?) {
         do {
@@ -35,43 +35,63 @@ class BucketeerProvider: FeatureProvider {
                 }
                 self.eventHandler.send(.ready)
             }
-            
+
         } catch {
             // OpenFeatureError .providerFatarError(message: error.localizedDescription
             self.eventHandler.send(.error)
         }
     }
-    
+
     func onContextSet(oldContext: (any EvaluationContext)?, newContext: any EvaluationContext) {
-        
+
     }
-    
-    func getBooleanEvaluation(key: String, defaultValue: Bool, context: (any EvaluationContext)?) throws -> ProviderEvaluation<Bool> {
+
+    func getBooleanEvaluation(
+        key: String,
+        defaultValue: Bool,
+        context: (any EvaluationContext)?)
+    throws -> ProviderEvaluation<Bool> {
         let client = try BKTClient.shared
         let evaluationDetails = client.boolVariationDetails(featureId: key, defaultValue: defaultValue)
         return evaluationDetails.toProviderEvaluation()
     }
-    
-    func getStringEvaluation(key: String, defaultValue: String, context: (any EvaluationContext)?) throws -> ProviderEvaluation<String> {
+
+    func getStringEvaluation(
+        key: String,
+        defaultValue: String,
+        context: (any EvaluationContext)?
+    ) throws -> ProviderEvaluation<String> {
         let client = try BKTClient.shared
         let evaluationDetails = client.stringVariationDetails(featureId: key, defaultValue: defaultValue)
         return evaluationDetails.toProviderEvaluation()
     }
-    
-    func getIntegerEvaluation(key: String, defaultValue: Int64, context: (any EvaluationContext)?) throws -> ProviderEvaluation<Int64> {
+
+    func getIntegerEvaluation(
+        key: String,
+        defaultValue: Int64,
+        context: (any EvaluationContext)?
+    ) throws -> ProviderEvaluation<Int64> {
         let client = try BKTClient.shared
         // on 64-bit platforms like iOS, `Int` is the same size as `Int64`
         let evaluationDetails = client.intVariationDetails(featureId: key, defaultValue: Int(defaultValue))
         return evaluationDetails.toProviderEvaluation()
     }
-    
-    func getDoubleEvaluation(key: String, defaultValue: Double, context: (any EvaluationContext)?) throws -> ProviderEvaluation<Double> {
+
+    func getDoubleEvaluation(
+        key: String,
+        defaultValue: Double,
+        context: (any EvaluationContext)?
+    ) throws -> ProviderEvaluation<Double> {
         let client = try BKTClient.shared
         let evaluationDetails = client.doubleVariationDetails(featureId: key, defaultValue: defaultValue)
         return evaluationDetails.toProviderEvaluation()
     }
-    
-    func getObjectEvaluation(key: String, defaultValue: Value, context: (any EvaluationContext)?) throws -> ProviderEvaluation<Value> {
+
+    func getObjectEvaluation(
+        key: String,
+        defaultValue: Value,
+        context: (any EvaluationContext)?
+    ) throws -> ProviderEvaluation<Value> {
         let client = try BKTClient.shared
         let bktDefaultValue = defaultValue.toBKTValue()
         let evaluationDetails = client.objectVariationDetails(featureId: key, defaultValue: bktDefaultValue)
@@ -86,7 +106,7 @@ class BucketeerProvider: FeatureProvider {
             overrideValue: shouldUseOpenFeatureDefaultValue ? defaultValue : nil
         )
     }
-    
+
     func observe() -> AnyPublisher<ProviderEvent, Never> {
         return eventHandler.observe()
     }
@@ -95,4 +115,3 @@ class BucketeerProvider: FeatureProvider {
 struct Metadata: ProviderMetadata {
     var name: String? = "Bucketeer Feature Flag Provider"
 }
-
