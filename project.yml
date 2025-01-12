@@ -1,0 +1,250 @@
+attributes:
+  LastSwiftUpdateCheck: '1420'
+  LastUpgradeCheck: '0930'
+  ORGANIZATIONNAME: Bucketeer
+configs:
+  Debug: debug
+  Release: release
+name: BucketeerOpenFeatureProvider
+options:
+  defaultConfig: Release
+  groupSortPosition: bottom
+  transitivelyLinkDependencies: false
+schemes:
+  BucketeerOpenFeature:
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+    build:
+      targets:
+        BucketeerOpenFeature:
+        - running
+        - testing
+        - profiling
+        - analyzing
+        - archiving
+    profile:
+      config: Release
+    run:
+      config: Debug
+    test:
+      config: Debug
+      environmentVariables:
+      - value: $(E2E_API_ENDPOINT)
+        variable: E2E_API_ENDPOINT
+      - value: $(E2E_API_KEY)
+        variable: E2E_API_KEY
+      targets:
+      - BucketeerOpenFeatureTests
+  Example:
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+    build:
+      targets:
+        Example:
+        - running
+        - testing
+        - profiling
+        - analyzing
+        - archiving
+    profile:
+      config: Release
+    run:
+      config: Debug
+    test:
+      config: Debug
+settings:
+  configs:
+    Debug:
+      CODE_SIGN_IDENTITY: iOS Developer
+      CURRENT_PROJECT_VERSION: '1'
+      IPHONEOS_DEPLOYMENT_TARGET: '10.0'
+      SDKROOT: iphoneos
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      SWIFT_OPTIMIZATION_LEVEL: -Onone
+      SWIFT_VERSION: '5.0'
+      VERSIONING_SYSTEM: apple-generic
+      VERSION_INFO_PREFIX: ''
+    Release:
+      CODE_SIGN_IDENTITY: iOS Developer
+      CURRENT_PROJECT_VERSION: '1'
+      IPHONEOS_DEPLOYMENT_TARGET: '10.0'
+      SDKROOT: iphoneos
+      SWIFT_OPTIMIZATION_LEVEL: -O
+      SWIFT_VERSION: '5.0'
+      VERSIONING_SYSTEM: apple-generic
+      VERSION_INFO_PREFIX: ''
+      VALIDATE_PRODUCT: 'YES'
+packages:
+  Bucketeer:
+    url: https://github.com/bucketeer-io/ios-client-sdk
+    from: 2.2.1
+  OpenFeature:
+    url: https://github.com/open-feature/swift-sdk
+    from: 0.3.0
+  BucketeerOpenFeatureProvider:
+    path: ../openfeature-swift-client-sdk
+targets:
+  BucketeerOpenFeature:
+    dependencies:
+    - package: Bucketeer
+      product: Bucketeer
+    - package: OpenFeature
+      product: OpenFeature
+    platform: iOS
+    postbuildScripts:
+    - name: Run Script(linter)
+      runOnlyWhenInstalling: false
+      script: "#Run this script if not in a CI environment or Carthage build.\nif
+        [ -n $CI ] && [ \"$CI\" = \"true\" ]; then\n  echo \"Run this script if not
+        in a CI environment.\"\n  exit 0\nelif [ -n \"$CARTHAGE\" ]; then\n  echo
+        \"Run this script if not in Carthage build.\"\n  exit 0\nfi\n\n#Workaround:
+        Add Homebrew Path for M1 Mac.\nif [ $(uname -m) = \"arm64\" ]; then\n  export
+        PATH=\"/opt/homebrew/bin:/opt/homebrew/sbin:${PATH+:$PATH}\";\nfi\n\nif which
+        mint >/dev/null; then\n make run-lint\nelse\n  echo \"Warning: Mint is not
+        installed. Please run make install-mint.\"\nfi\n"
+      shell: /bin/sh
+    productName: BucketeerOpenFeature
+    settings:
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: iOS Developer
+          BUILD_LIBRARY_FOR_DISTRIBUTION: 'YES'
+          CLANG_CXX_LANGUAGE_STANDARD: gnu++17
+          CODE_SIGN_STYLE: Automatic
+          INFOPLIST_FILE: BucketeerOpenFeature/Info.plist
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
+          IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]: '13.1'
+          MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
+          MTL_FAST_MATH: 'YES'
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.openfeature.provider
+          SUPPORTED_PLATFORMS: appletvos appletvsimulator iphoneos iphonesimulator
+          SUPPORTS_MACCATALYST: 'YES'
+          SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: 'YES'
+          SWIFT_EMIT_LOC_STRINGS: 'YES'
+          SWIFT_VERSION: '5.0'
+          TARGETED_DEVICE_FAMILY: 1,2,3
+          TVOS_DEPLOYMENT_TARGET: '14.0'
+          LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+        Release:
+          CODE_SIGN_IDENTITY: iOS Developer
+          BUILD_LIBRARY_FOR_DISTRIBUTION: 'YES'
+          CLANG_CXX_LANGUAGE_STANDARD: gnu++17
+          CODE_SIGN_STYLE: Automatic
+          INFOPLIST_FILE: BucketeerOpenFeature/Info.plist
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
+          IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]: '13.1'
+          MTL_FAST_MATH: 'YES'
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.openfeature.provider
+          SUPPORTED_PLATFORMS: appletvos appletvsimulator iphoneos iphonesimulator
+          SUPPORTS_MACCATALYST: 'YES'
+          SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: 'YES'
+          SWIFT_EMIT_LOC_STRINGS: 'YES'
+          SWIFT_VERSION: '5.0'
+          TARGETED_DEVICE_FAMILY: 1,2,3
+          TVOS_DEPLOYMENT_TARGET: '14.0'
+          LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
+    sources:
+    - name: BucketeerOpenFeature
+      path: BucketeerOpenFeature
+    type: library.static
+  BucketeerOpenFeatureTests:
+    dependencies:
+    - package: Bucketeer
+      product: Bucketeer
+    - package: OpenFeature
+      product: OpenFeature
+    - target: BucketeerOpenFeature
+      embed: false
+    platform: iOS
+    productName: BucketeerOpenFeatureTests
+    settings:
+      configs:
+        Debug:
+          ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: 'YES'
+          CLANG_CXX_LANGUAGE_STANDARD: gnu++17
+          CODE_SIGN_STYLE: Automatic
+          CURRENT_PROJECT_VERSION: '1'
+          GENERATE_INFOPLIST_FILE: 'YES'
+          INFOPLIST_KEY_LSApplicationCategoryType: ''
+          IPHONEOS_DEPLOYMENT_TARGET: '15.5'
+          MARKETING_VERSION: '1.0'
+          MTL_ENABLE_DEBUG_INFO: INCLUDE_SOURCE
+          MTL_FAST_MATH: 'YES'
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.tests
+          SWIFT_EMIT_LOC_STRINGS: 'NO'
+          SWIFT_VERSION: '5.0'
+        Release:
+          ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: 'YES'
+          CLANG_CXX_LANGUAGE_STANDARD: gnu++17
+          CODE_SIGN_STYLE: Automatic
+          CURRENT_PROJECT_VERSION: '1'
+          GENERATE_INFOPLIST_FILE: 'YES'
+          INFOPLIST_KEY_LSApplicationCategoryType: ''
+          IPHONEOS_DEPLOYMENT_TARGET: '15.5'
+          MARKETING_VERSION: '1.0'
+          MTL_FAST_MATH: 'YES'
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.tests
+          SWIFT_EMIT_LOC_STRINGS: 'NO'
+          SWIFT_VERSION: '5.0'
+    sources:
+    - name: BucketeerOpenFeatureTests
+      path: BucketeerOpenFeatureTests
+    type: bundle.unit-test
+  Example:
+    entitlements:
+      path: Example/Example.entitlements
+      properties:
+        aps-environment: development
+    dependencies:
+    - package: BucketeerOpenFeatureProvider
+      product: BucketeerOpenFeature
+    platform: iOS
+    configFiles:
+      Debug: environment.xcconfig
+    settings:
+      configs:
+        Debug:
+          CODE_SIGN_IDENTITY: Apple Development
+          CODE_SIGN_STYLE: Automatic
+          GENERATE_INFOPLIST_FILE: 'NO'
+          INFOPLIST_FILE: Example/Info.plist
+          INFOPLIST_KEY_LSApplicationCategoryType: ''
+          INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
+          INFOPLIST_KEY_UIMainStoryboardFile: Main
+          INFOPLIST_KEY_UIRequiredDeviceCapabilities: armv7
+          INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+            UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+          INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
+            UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft
+            UIInterfaceOrientationLandscapeRight
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
+          MTL_ENABLE_DEBUG_INFO: 'YES'
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.example
+          PROVISIONING_PROFILE_SPECIFIER: ''
+          SWIFT_VERSION: '5.0'
+        Release:
+          CODE_SIGN_IDENTITY: Apple Development
+          CODE_SIGN_STYLE: Automatic
+          GENERATE_INFOPLIST_FILE: 'NO'
+          INFOPLIST_FILE: Example/Info.plist
+          INFOPLIST_KEY_LSApplicationCategoryType: ''
+          INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
+          INFOPLIST_KEY_UIMainStoryboardFile: Main
+          INFOPLIST_KEY_UIRequiredDeviceCapabilities: armv7
+          INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+            UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+          INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
+            UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft
+            UIInterfaceOrientationLandscapeRight
+          IPHONEOS_DEPLOYMENT_TARGET: '14.0'
+          PRODUCT_BUNDLE_IDENTIFIER: io.bucketeer.sdk.ios.example
+          PROVISIONING_PROFILE_SPECIFIER: ''
+          SWIFT_VERSION: '5.0'
+    sources:
+    - name: Example
+      path: Example
+    type: application
