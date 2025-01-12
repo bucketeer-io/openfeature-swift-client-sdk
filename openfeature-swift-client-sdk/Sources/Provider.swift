@@ -59,7 +59,10 @@ class BucketeerProvider: FeatureProvider {
     }
     
     func getIntegerEvaluation(key: String, defaultValue: Int64, context: (any EvaluationContext)?) throws -> ProviderEvaluation<Int64> {
-        throw CancellationError()
+        let client = try BKTClient.shared
+        // on 64-bit platforms like iOS, `Int` is the same size as `Int64`
+        let evaluationDetails = client.intVariationDetails(featureId: key, defaultValue: Int(defaultValue))
+        return evaluationDetails.toProviderEvaluation()
     }
     
     func getDoubleEvaluation(key: String, defaultValue: Double, context: (any EvaluationContext)?) throws -> ProviderEvaluation<Double> {

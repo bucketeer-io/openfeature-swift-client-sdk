@@ -21,6 +21,16 @@ extension BKTEvaluationDetails where T: Equatable {
     }
 }
 
+extension BKTEvaluationDetails where T == Int {
+    func toProviderEvaluation() -> ProviderEvaluation<Int64> {
+        return ProviderEvaluation<Int64>(
+            value: Int64(self.variationValue),
+            flagMetadata: [:],
+            variant: nil,
+            reason: self.reason.rawValue)
+    }
+}
+
 
 extension BKTValue {
     func toOpenFeatureValue() -> Value {
@@ -51,16 +61,9 @@ extension Value {
         case .double(let raw):
             return .number(raw)
         case .list(let raw):
-            return .list(raw.map({ value in
-                return value.toBKTValue()
-            }))
+            return .list(raw.map({ $0.toBKTValue() }))
         case .structure(let raw):
-            var convertedValue: [String:BKTValue] = [:]
-            
-            raw.forEach { key, value in
-                convertedValue[key]=value.toBKTValue()
-            }
-            return .dictionary(convertedValue)
+            return .dictionary(raw.mapValues({ $0.toBKTValue() }))
         case .null:
             return .null
         case .integer(let raw):
