@@ -22,10 +22,27 @@ internal protocol BucketeerProtocol {
 extension BKTClient: BucketeerProtocol {}
 
 internal protocol BucketeerDI {
-    func destroy() throws
+    func destroy()
     func initialize(
         config: BKTConfig,
         user: BKTUser,
-        timeoutMillis: Int64,
-        completion: ((BKTError?) -> Void)) throws
+        completion: @escaping ((BucketeerProtocol?, BKTError?) -> Void)) throws
+}
+
+class BucketeerDIContainer: BucketeerDI {
+    func destroy() {
+        try? BKTClient.destroy()
+    }
+
+    func initialize(
+        config: BKTConfig,
+        user: BKTUser,
+        completion: @escaping (((any BucketeerProtocol)?, BKTError?) -> Void)) throws {
+        try BKTClient.initialize(
+            config: config,
+            user: user
+        ) { error in
+            completion(try? BKTClient.shared, error)
+        }
+    }
 }

@@ -10,10 +10,18 @@ class BucketeerProvider: FeatureProvider {
     private let config: BKTConfig
     private let user: BKTUser
 
-    public init(
+    private var diContainer: BucketeerDI!
+
+    public convenience init(
         config: BKTConfig,
         user: BKTUser
     ) {
+        self.init(diContainer: BucketeerDIContainer(), config: config, user: user)
+    }
+
+    /// Internal initialization of BucketeerProvider. Required for testing purpose.
+    internal init(diContainer: BucketeerDI, config: BKTConfig, user: BKTUser) {
+        self.diContainer = diContainer
         self.config = config
         self.user = user
     }
@@ -23,10 +31,10 @@ class BucketeerProvider: FeatureProvider {
     /// Called by OpenFeatureAPI whenever the new Provider is registered
     func initialize(initialContext: (any EvaluationContext)?) {
         do {
-            try BKTClient.initialize(
+            try diContainer.initialize(
                 config: config,
                 user: user
-            ) { error in
+            ) { _, error in
                 if let error = error {
                     if case .timeout = error {
                         self.eventHandler.send(.ready)
