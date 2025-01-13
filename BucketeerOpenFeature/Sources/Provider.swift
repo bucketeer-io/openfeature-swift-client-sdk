@@ -18,6 +18,8 @@ class BucketeerProvider: FeatureProvider {
         self.user = user
     }
 
+    deinit {}
+
     /// Called by OpenFeatureAPI whenever the new Provider is registered
     func initialize(initialContext: (any EvaluationContext)?) {
         do {
@@ -43,7 +45,7 @@ class BucketeerProvider: FeatureProvider {
     }
 
     func onContextSet(oldContext: (any EvaluationContext)?, newContext: any EvaluationContext) {
-
+        // We should check if the user has changed, and update the user in the Bucketeer client.
     }
 
     func getBooleanEvaluation(
