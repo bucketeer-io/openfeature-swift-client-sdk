@@ -148,7 +148,7 @@ targets:
     sources:
     - name: BucketeerOpenFeature
       path: BucketeerOpenFeature
-    type: framework
+    type: library.static
   BucketeerOpenFeatureTests:
     dependencies:
     - target: BucketeerOpenFeature
