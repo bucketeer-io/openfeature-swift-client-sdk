@@ -71,4 +71,43 @@ extension Value {
             return .number(raw.timeIntervalSince1970)
         }
     }
+
+    func toString() -> String {
+        switch self {
+        case .boolean(let raw):
+            return raw.description
+        case .string(let raw):
+            return raw
+        case .double(let raw):
+            return raw.description
+        case .integer(let raw):
+            return raw.description
+        case .list(let raw):
+            return raw.map { $0.toString() }.joined(separator: ", ")
+        case .structure(let raw):
+            return raw.map { "\($0.key): \($0.value.toString())" }.joined(separator: ", ")
+        case .date(let raw):
+            return raw.description
+        case .null:
+            return "null"
+        }
+    }
+}
+
+extension EvaluationContext {
+    func toBKTUser() throws -> BKTUser {
+        // We should convert the EvaluationContext to a BKTUser.
+        do {
+            let maps = self.asMap()
+            let targetUserId = self.getTargetingKey()
+            let attributes = maps.mapValues({ $0.toString() })
+            let user = try BKTUser.Builder()
+                .with(id: targetUserId)
+                .with(attributes: attributes)
+                .build()
+            return user
+        } catch {
+            throw OpenFeatureError.targetingKeyMissingError
+        }
+    }
 }

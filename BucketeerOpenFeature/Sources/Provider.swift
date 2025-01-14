@@ -8,35 +8,42 @@ class BucketeerProvider: FeatureProvider {
     var metadata: ProviderMetadata = Metadata()
 
     private let config: BKTConfig
-    private let user: BKTUser
 
-    private var diContainer: BucketeerDI!
+    private let diContainer: BucketeerDI!
+    private var client: BucketeerProtocol?
 
     public convenience init(
-        config: BKTConfig,
-        user: BKTUser
-    ) {
-        self.init(diContainer: BucketeerDIContainer(), config: config, user: user)
+        builder: BKTConfig.Builder
+    ) throws {
+        do {
+            try self.init(diContainer: BucketeerDIContainer(), builder: builder)
+        } catch {
+            throw OpenFeatureError.providerFatarError(message: error.localizedDescription)
+        }
     }
 
     /// Internal initialization of BucketeerProvider. Required for testing purpose.
-    internal init(diContainer: BucketeerDI, config: BKTConfig, user: BKTUser) {
+    init(diContainer: BucketeerDI, builder: BKTConfig.Builder) throws {
         self.diContainer = diContainer
-        self.config = config
-        self.user = user
+        self.config = try builder.build()
     }
 
-    deinit {}
+    deinit {
+        diContainer.destroy()
+    }
 
     /// Called by OpenFeatureAPI whenever the new Provider is registered
     func initialize(initialContext: (any EvaluationContext)?) {
         do {
+            let user = try (initialContext ?? MutableContext()).toBKTUser()
             try diContainer.initialize(
                 config: config,
                 user: user
             ) { _, error in
                 if let error = error {
                     if case .timeout = error {
+                        // Its okay if the error is timed out. It only means the cache is not update yet.
+                        // But the cache will be updated in the background automatically.
                         self.eventHandler.send(.ready)
                     } else {
                         self.eventHandler.send(.error)
@@ -45,15 +52,30 @@ class BucketeerProvider: FeatureProvider {
                 }
                 self.eventHandler.send(.ready)
             }
-
         } catch {
-            // OpenFeatureError .providerFatarError(message: error.localizedDescription
             self.eventHandler.send(.error)
         }
     }
 
     func onContextSet(oldContext: (any EvaluationContext)?, newContext: any EvaluationContext) {
-        // We should check if the user has changed, and update the user in the Bucketeer client.
+        // We should check if the user attributes has been changed
+        // to update the user attributes in the Bucketeer client.
+        do {
+            let client = try requiredClient()
+            guard let currentUser = client.currentUser() else {
+                throw OpenFeatureError.providerNotReadyError
+            }
+            let user = try newContext.toBKTUser()
+            // Not support for changing user id,
+            // for changing user id, we need to reinitialize the Bucketeer client.
+            guard currentUser.id == user.id else {
+                throw OpenFeatureError.invalidContextError
+            }
+
+            client.updateUserAttributes(attributes: user.attr)
+        } catch {
+            eventHandler.send(.error)
+        }
     }
 
     func getBooleanEvaluation(
@@ -61,7 +83,7 @@ class BucketeerProvider: FeatureProvider {
         defaultValue: Bool,
         context: (any EvaluationContext)?)
     throws -> ProviderEvaluation<Bool> {
-        let client = try BKTClient.shared
+        let client = try requiredClient()
         let evaluationDetails = client.boolVariationDetails(featureId: key, defaultValue: defaultValue)
         return evaluationDetails.toProviderEvaluation()
     }
@@ -71,7 +93,7 @@ class BucketeerProvider: FeatureProvider {
         defaultValue: String,
         context: (any EvaluationContext)?
     ) throws -> ProviderEvaluation<String> {
-        let client = try BKTClient.shared
+        let client = try requiredClient()
         let evaluationDetails = client.stringVariationDetails(featureId: key, defaultValue: defaultValue)
         return evaluationDetails.toProviderEvaluation()
     }
@@ -81,7 +103,7 @@ class BucketeerProvider: FeatureProvider {
         defaultValue: Int64,
         context: (any EvaluationContext)?
     ) throws -> ProviderEvaluation<Int64> {
-        let client = try BKTClient.shared
+        let client = try requiredClient()
         // on 64-bit platforms like iOS, `Int` is the same size as `Int64`
         let evaluationDetails = client.intVariationDetails(featureId: key, defaultValue: Int(defaultValue))
         return evaluationDetails.toProviderEvaluation()
@@ -92,7 +114,7 @@ class BucketeerProvider: FeatureProvider {
         defaultValue: Double,
         context: (any EvaluationContext)?
     ) throws -> ProviderEvaluation<Double> {
-        let client = try BKTClient.shared
+        let client = try requiredClient()
         let evaluationDetails = client.doubleVariationDetails(featureId: key, defaultValue: defaultValue)
         return evaluationDetails.toProviderEvaluation()
     }
@@ -102,7 +124,7 @@ class BucketeerProvider: FeatureProvider {
         defaultValue: Value,
         context: (any EvaluationContext)?
     ) throws -> ProviderEvaluation<Value> {
-        let client = try BKTClient.shared
+        let client = try requiredClient()
         let bktDefaultValue = defaultValue.toBKTValue()
         let evaluationDetails = client.objectVariationDetails(featureId: key, defaultValue: bktDefaultValue)
         let shouldUseOpenFeatureDefaultValue = bktDefaultValue == evaluationDetails.variationValue
@@ -120,6 +142,14 @@ class BucketeerProvider: FeatureProvider {
     func observe() -> AnyPublisher<ProviderEvent, Never> {
         return eventHandler.observe()
     }
+
+    private func requiredClient() throws -> BucketeerProtocol {
+        guard let client = client else {
+            throw OpenFeatureError.providerNotReadyError
+        }
+        return client
+    }
+
 }
 
 struct Metadata: ProviderMetadata {

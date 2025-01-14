@@ -1,6 +1,5 @@
 import Bucketeer
 
-// BucketeerProtocol is use for testing purpose
 internal protocol BucketeerProtocol {
     func boolVariationDetails(featureId: String, defaultValue: Bool) -> BKTEvaluationDetails<Bool>
 
