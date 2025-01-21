@@ -102,7 +102,7 @@ targets:
         \"Run this script if not in Carthage build.\"\n  exit 0\nfi\n\n#Workaround:
         Add Homebrew Path for M1 Mac.\nif [ $(uname -m) = \"arm64\" ]; then\n  export
         PATH=\"/opt/homebrew/bin:/opt/homebrew/sbin:${PATH+:$PATH}\";\nfi\n\nif which
-        mint >/dev/null; then\n  make run-lint\nelse\n  echo \"Warning: Mint is not
+        mint >/dev/null; then\n  make run-lint-fix && make run-lint\nelse\n  echo \"Warning: Mint is not
         installed. Please run make install-mint.\"\nfi\n"
       shell: /bin/sh
     productName: BucketeerOpenFeature
@@ -151,6 +151,10 @@ targets:
     type: library.static
   BucketeerOpenFeatureTests:
     dependencies:
+    - package: Bucketeer
+      product: Bucketeer
+    - package: OpenFeature
+      product: OpenFeature
     - target: BucketeerOpenFeature
       embed: false
     platform: iOS

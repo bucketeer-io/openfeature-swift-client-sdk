@@ -72,6 +72,10 @@ install-mint:
 bootstrap-mint:
 	./hack/mint.sh --bootstrap
 
+.PHONY: run-lint-fix
+run-lint-fix:
+	swiftlint --fix
+
 .PHONY: run-lint
 run-lint:
 	./hack/lint.sh --run

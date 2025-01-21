@@ -15,7 +15,7 @@ let package = Package(
     dependencies: [
         // OpenFeature
         .package(url: "git@github.com:open-feature/swift-sdk.git", from: "0.2.1"),
-        .package(url: "git@github.com/bucketeer-io/ios-client-sdk.git", from: "2.2.1"),
+        .package(url: "git@github.com/bucketeer-io/ios-client-sdk.git", from: "2.2.1")
     ],
     targets: [
         .target(
