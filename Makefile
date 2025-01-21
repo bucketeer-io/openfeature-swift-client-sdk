@@ -1,9 +1,9 @@
-APP_NAME=Bucketeer
+APP_NAME=BucketeerOpenFeatureProvider
 
 BUILD_SETTINGS ?= CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 CONFIGURATION ?= Debug
-SCHEME ?= $(APP_NAME)
-DEVICE ?= "iPhone\ 15"
+SCHEME ?= BucketeerOpenFeature
+DEVICE ?= "iPhone\ 15\ Pro"
 
 XCODEBUILD=xcodebuild
 
