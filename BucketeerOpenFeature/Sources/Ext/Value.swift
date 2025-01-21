@@ -36,7 +36,9 @@ extension Value {
         case .list(let raw):
             return raw.map { $0.toString() }.joined(separator: ", ")
         case .structure(let raw):
-            return raw.map { "\($0.key): \($0.value.toString())" }.joined(separator: ", ")
+            return raw.sorted { $0.key < $1.key } // Sort keys alphabetically
+                        .map { "\($0.key): \($0.value.toString())" }
+                        .joined(separator: ", ")
         case .date(let raw):
             return raw.description
         case .null:

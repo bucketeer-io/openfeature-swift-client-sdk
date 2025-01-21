@@ -32,7 +32,7 @@ struct ValueExtTests {
             (.double(1.0), "1.0"),
             (.integer(1), "1"),
             (.list([.boolean(true), .string("string")]), "true, string"),
-            (.structure(["a": .boolean(true), "b": .string("string")]), "b: string, a: true"),
+            (.structure(["a": .boolean(true), "b": .string("string")]), "a: true, b: string"),
             (.date(Date(timeIntervalSince1970: 101)), "1970-01-01 00:01:41 +0000"),
             (.null, "null")]
 
