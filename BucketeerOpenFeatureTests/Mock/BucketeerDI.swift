@@ -9,13 +9,11 @@ class MockBucketeerDI: BucketeerDI {
 
     let client: MockBucketeerClient
 
-    let onDestroy: OnDestroyCallback?
-    let onInitializeError: BKTError?
+    var onDestroy: OnDestroyCallback?
+    var onInitializeError: BKTError?
 
-    init(client: MockBucketeerClient, onDestroy: OnDestroyCallback? = nil, onInitializeError: BKTError? = nil) {
+    init(client: MockBucketeerClient) {
         self.client = client
-        self.onDestroy = onDestroy
-        self.onInitializeError = onInitializeError
     }
 
     func destroy() {

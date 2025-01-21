@@ -13,19 +13,15 @@ class BucketeerProvider: FeatureProvider {
     private var client: BucketeerProtocol?
 
     public convenience init(
-        builder: BKTConfig.Builder
-    ) throws {
-        do {
-            try self.init(diContainer: BucketeerDIContainer(), builder: builder)
-        } catch {
-            throw OpenFeatureError.providerFatarError(message: error.localizedDescription)
-        }
+        config: BKTConfig
+    ) {
+        self.init(diContainer: BucketeerDIContainer(), config: config)
     }
 
     /// Internal initialization of BucketeerProvider. Required for testing purpose.
-    init(diContainer: BucketeerDI, builder: BKTConfig.Builder) throws {
+    init(diContainer: BucketeerDI, config: BKTConfig) {
         self.diContainer = diContainer
-        self.config = try builder.build()
+        self.config = config
     }
 
     deinit {
@@ -39,7 +35,8 @@ class BucketeerProvider: FeatureProvider {
             try diContainer.initialize(
                 config: config,
                 user: user
-            ) { _, error in
+            ) { [weak self] client, error in
+                guard let self = self else { return }
                 if let error = error {
                     if case .timeout = error {
                         // Its okay if the error is timed out. It only means the cache is not update yet.
@@ -50,6 +47,7 @@ class BucketeerProvider: FeatureProvider {
                     }
                     return
                 }
+                self.client = client
                 self.eventHandler.send(.ready)
             }
         } catch {
@@ -57,6 +55,13 @@ class BucketeerProvider: FeatureProvider {
         }
     }
 
+    /// Called by OpenFeatureAPI whenever the context is changed
+    /// Checks if the user attributes have changed and updates the
+    /// attributes in the Bucketeer client accordingly.
+    ///
+    /// Note:
+    /// - Changing the user ID is not supported in the current implementation.
+    /// - To handle a user ID change, the BucketeerProvider must be remove and reinitialized.
     func onContextSet(oldContext: (any EvaluationContext)?, newContext: any EvaluationContext) {
         // We should check if the user attributes has been changed
         // to update the user attributes in the Bucketeer client.
@@ -67,11 +72,9 @@ class BucketeerProvider: FeatureProvider {
             }
             let user = try newContext.toBKTUser()
             // Not support for changing user id,
-            // for changing user id, we need to reinitialize the Bucketeer client.
             guard currentUser.id == user.id else {
                 throw OpenFeatureError.invalidContextError
             }
-
             client.updateUserAttributes(attributes: user.attr)
         } catch {
             eventHandler.send(.error)
