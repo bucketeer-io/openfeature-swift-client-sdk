@@ -3,9 +3,6 @@ import Bucketeer
 import OpenFeature
 @testable import BucketeerOpenFeature
 
-typealias OnInitializeCallback = ((Bucketeer.BKTConfig,
-                                   Bucketeer.BKTUser,
-                                   (((any BucketeerProtocol)?, Bucketeer.BKTError?) -> Void)) -> Void)
 typealias OnDestroyCallback = (() -> Void)
 
 class MockBucketeerDI: BucketeerDI {
@@ -13,12 +10,12 @@ class MockBucketeerDI: BucketeerDI {
     let client: MockBucketeerClient
 
     let onDestroy: OnDestroyCallback?
-    let onInitialize: OnInitializeCallback?
+    let onInitializeError: BKTError?
 
-    init(client: MockBucketeerClient, onDestroy: OnDestroyCallback? = nil, onInitialize: OnInitializeCallback? = nil) {
+    init(client: MockBucketeerClient, onDestroy: OnDestroyCallback? = nil, onInitializeError: BKTError? = nil) {
         self.client = client
         self.onDestroy = onDestroy
-        self.onInitialize = onInitialize
+        self.onInitializeError = onInitializeError
     }
 
     func destroy() {
@@ -27,8 +24,8 @@ class MockBucketeerDI: BucketeerDI {
 
     func initialize(config: Bucketeer.BKTConfig,
                     user: Bucketeer.BKTUser,
-                    completion: @escaping (((any BucketeerProtocol)?, Bucketeer.BKTError?) -> Void)) throws {
-        onInitialize?(config, user, completion)
+                    completion: @escaping (((any BucketeerProtocol)?, BKTError?) -> Void)) throws {
+        completion(client, onInitializeError)
     }
 }
 
