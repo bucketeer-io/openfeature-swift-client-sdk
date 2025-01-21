@@ -3,7 +3,7 @@ APP_NAME=BucketeerOpenFeatureProvider
 BUILD_SETTINGS ?= CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 CONFIGURATION ?= Debug
 SCHEME ?= BucketeerOpenFeature
-DEVICE ?= "iPhone\ 15\ Pro"
+DEVICE ?= "iPhone\ 16"
 
 XCODEBUILD=xcodebuild
 
