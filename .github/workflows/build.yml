@@ -1,0 +1,85 @@
+name: Build & Integration tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - '*.md'
+      - '.github/**'
+    branches:
+      - main
+
+jobs:
+  generate-xcode-project:
+    uses: ./.github/workflows/generate-xcode-project.yml
+
+  build:
+    needs: generate-xcode-project
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download xcode project file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Build
+        env:
+          CI: true
+        run: make build
+
+  build-example:
+    needs: generate-xcode-project
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download xcode project file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Download environment file
+        uses: actions/download-artifact@v4
+        with:
+            name: output-environment-file
+            path: ./environment.xcconfig
+
+      - name: Build example
+        env:
+          CI: true
+        run: make build-example
+
+  test:
+    name: Unit tests
+    needs: generate-xcode-project
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download xcode project file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Download environment file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-environment-file
+          path: ./environment.xcconfig
+
+      - name: Build for testing
+        run: make build-for-testing
+
+      - name: Unit Test
+        run: make test-without-building
+
+  e2e:
+    name: E2E tests
+    needs: generate-xcode-project
+    uses: ./.github/workflows/e2e.yml
+    secrets: inherit
