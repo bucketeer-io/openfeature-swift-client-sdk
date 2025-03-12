@@ -1,0 +1,79 @@
+name: Pull Request
+
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - '.github/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  lint_swift:
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bootstrap mint
+        uses: irgaly/setup-mint@99eaad2ad1197ea872390322a47620da2f21fde4 # v1.4.0
+        with:
+          bootstrap: true
+          use-cache: true
+
+      - name: Lint swift
+        run: mint run swiftlint --strict
+
+  generate-xcode-project:
+    uses: ./.github/workflows/generate-xcode-project.yml
+
+  build:
+    needs: generate-xcode-project
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download xcode project file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Download environment file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-environment-file
+          path: ./environment.xcconfig          
+        
+      - name: Build
+        env:
+          CI: true
+        run: make build
+        
+      - name: Build example
+        env:
+          CI: true
+        run: make build-example
+
+  
+  test:
+    needs: generate-xcode-project
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download xcode project file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Build for testing
+        env:
+          CI: true
+        run: make build-for-testing
+
+      - name: Unit Test
+        run: make test-without-building

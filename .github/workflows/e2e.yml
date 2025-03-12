@@ -1,0 +1,39 @@
+name: E2E tests
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  generate-xcode-project:
+    if: ${{ github.event.workflow  == '.github/workflows/e2e.yml'}}
+    uses: ./.github/workflows/generate-xcode-project.yml
+
+  e2e:
+    # We must ensure the xcode project file is uploaded before proceeding
+    needs: generate-xcode-project
+    if: always()
+    name: E2E tests
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download xcode project file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Download environment file
+        uses: actions/download-artifact@v4
+        with:
+          name: output-environment-file
+          path: ./environment.xcconfig
+
+      - name: Build for testing
+        run: make build-for-testing
+
+      - name: E2E Test
+        env:
+          E2E_API_ENDPOINT: ${{ secrets.E2E_API_ENDPOINT }}
+          E2E_API_KEY: ${{ secrets.E2E_API_KEY }}
+        run: make e2e-without-building

@@ -1,0 +1,33 @@
+name: Generate Xcode project
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  generate-xcode-project:
+    runs-on: macos-15-xlarge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bootstrap mint
+        uses: irgaly/setup-mint@99eaad2ad1197ea872390322a47620da2f21fde4 # v1.4.0
+        with:
+          bootstrap: true
+          use-cache: true
+
+      - name: Generate XcodeProject
+        run: |
+          make environment-setup
+          mint run xcodegen generate
+
+      - name: Upload Xcode project file
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-xcodeproj-file
+          path: ./BucketeerOpenFeatureProvider.xcodeproj
+
+      - name: Upload dummy environment file
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-environment-file
+          path: ./environment.xcconfig
