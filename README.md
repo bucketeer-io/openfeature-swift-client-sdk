@@ -4,7 +4,7 @@ This is the official Swift OpenFeature provider for accessing your feature flags
 
 [Bucketeer](https://bucketeer.io) is an open-source platform created by [CyberAgent](https://www.cyberagent.co.jp/en/) to help teams make better decisions, reduce deployment lead time and release risk through feature flags. Bucketeer offers advanced features like dark launches and staged rollouts that perform limited releases based on user attributes, devices, and other segments.
 
-In conjuction with the [OpenFeature SDK](https://openfeature.dev/docs/reference/concepts/provider) you will be able to evaluate your feature flags in your **iOS**/**tvOS** applications.
+In conjunction with the [OpenFeature SDK](https://openfeature.dev/docs/reference/concepts/provider) you will be able to evaluate your feature flags in your **iOS**/**tvOS** applications.
 
 > [!WARNING]
 > This is a beta version. Breaking changes may be introduced before general release.
@@ -37,7 +37,7 @@ Select **File > Swift Packages > Add Package Dependency** and enter the reposito
 
 Next select the product "BucketeerOpenFeature" and add it to your app target.
 
-## Usuage
+## Usage
 
 ### Initialize the provider
 
@@ -73,7 +73,7 @@ do {
 }
 ```
 
-See our [documentation](https://docs.bucketeer.io/sdk/client-side/ios) for more SDK configuration..
+See our [documentation](https://docs.bucketeer.io/sdk/client-side/ios) for more SDK configuration.
 
 The evaluation context allows the client to specify contextual data that Bucketeer uses to evaluate the feature flags.
 
