@@ -53,11 +53,13 @@ jobs:
           echo "Available iPhone simulators:"
           xcrun simctl list devices available | grep "iPhone" || echo "No iPhone simulators found!"
 
+      # The artifact contains a single file; download to the repo root so it
+      # lands at ./environment.xcconfig instead of ./environment.xcconfig/environment.xcconfig
       - name: Download environment file
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: output-environment-file
-          path: ./environment.xcconfig
+          path: .
 
       - name: Build for testing
         run: make build-for-testing

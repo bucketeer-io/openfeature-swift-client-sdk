@@ -41,12 +41,15 @@ jobs:
           name: output-xcodeproj-file
           path: ./BucketeerOpenFeatureProvider.xcodeproj
 
+      # The artifact contains a single file; download to the repo root so it
+      # lands at ./environment.xcconfig instead of ./environment.xcconfig/environment.xcconfig
       - name: Download environment file
         uses: actions/download-artifact@v4
         with:
           name: output-environment-file
-          path: ./environment.xcconfig          
-        
+          path: .
+
+
       - name: Build
         env:
           CI: true
