@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install bootstrap mint
-        uses: irgaly/setup-mint@99eaad2ad1197ea872390322a47620da2f21fde4 # v1.4.0
+        uses: irgaly/setup-mint@d61b6ece0c0f5486ea8a17de6026e8da5468af60 # v1.7.0
         with:
           bootstrap: true
           use-cache: true
