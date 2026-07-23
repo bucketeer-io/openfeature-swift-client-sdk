@@ -84,7 +84,8 @@ packages:
     from: 2.2.1
   OpenFeature:
     url: https://github.com/open-feature/swift-sdk
-    from: 0.3.0
+    # Pinned: 0.4.0 removed MutableContext and other APIs we depend on
+    exactVersion: 0.3.1
   BucketeerOpenFeatureProvider:
     path: ../openfeature-swift-client-sdk
 targets:
