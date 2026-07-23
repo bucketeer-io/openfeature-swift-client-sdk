@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install bootstrap mint
-        uses: irgaly/setup-mint@99eaad2ad1197ea872390322a47620da2f21fde4 # v1.4.0
+        uses: irgaly/setup-mint@d61b6ece0c0f5486ea8a17de6026e8da5468af60 # v1.7.0
         with:
           bootstrap: true
           use-cache: true
@@ -41,12 +41,15 @@ jobs:
           name: output-xcodeproj-file
           path: ./BucketeerOpenFeatureProvider.xcodeproj
 
+      # The artifact contains a single file; download to the repo root so it
+      # lands at ./environment.xcconfig instead of ./environment.xcconfig/environment.xcconfig
       - name: Download environment file
         uses: actions/download-artifact@v4
         with:
           name: output-environment-file
-          path: ./environment.xcconfig          
-        
+          path: .
+
+
       - name: Build
         env:
           CI: true

@@ -14,7 +14,8 @@ let package = Package(
     ],
     dependencies: [
         // OpenFeature
-        .package(url: "git@github.com:open-feature/swift-sdk.git", from: "0.2.1"),
+        // Upper bound: 0.4.0 removed MutableContext and other APIs we depend on
+        .package(url: "git@github.com:open-feature/swift-sdk.git", "0.2.1"..<"0.4.0"),
         .package(url: "git@github.com/bucketeer-io/ios-client-sdk.git", from: "2.2.1")
     ],
     targets: [
