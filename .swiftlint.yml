@@ -15,12 +15,11 @@ opt_in_rules:
 analyzer_rules:
   - unused_declaration
   - unused_import
-  
+
 excluded:
   - Example
   - ExampleTVOS
   - DerivedData
-
 
 allow_zero_lintable_files: false
 

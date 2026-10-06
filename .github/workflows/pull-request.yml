@@ -13,15 +13,27 @@ concurrency:
 jobs:
 
   lint_swift:
+    # analyzer_rules in .swiftlint.yml need SourceKit; Linux release binaries cannot load it on GHA.
     runs-on: macos-15-xlarge
+    env:
+      MINT_PATH: .mint/lib
+      MINT_LINK_PATH: .mint/bin
+      SWIFTLINT_VERSION: 0.53.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install bootstrap mint
-        uses: irgaly/setup-mint@d61b6ece0c0f5486ea8a17de6026e8da5468af60 # v1.7.0
+      - name: Cache Mint
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          bootstrap: true
-          use-cache: true
+          path: .mint
+          key: ${{ runner.os }}-mint-swiftlint-${{ env.SWIFTLINT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-mint-swiftlint-
+
+      - name: Install Mint and SwiftLint
+        run: |
+          brew list mint &>/dev/null || brew install mint
+          mint install "realm/SwiftLint@${SWIFTLINT_VERSION}"
 
       - name: Lint swift
         run: mint run swiftlint --strict
@@ -33,10 +45,10 @@ jobs:
     needs: generate-xcode-project
     runs-on: macos-15-xlarge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: Download xcode project file
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
         with:
           name: output-xcodeproj-file
           path: ./BucketeerOpenFeatureProvider.xcodeproj
@@ -44,7 +56,7 @@ jobs:
       # The artifact contains a single file; download to the repo root so it
       # lands at ./environment.xcconfig instead of ./environment.xcconfig/environment.xcconfig
       - name: Download environment file
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
         with:
           name: output-environment-file
           path: .
@@ -65,10 +77,10 @@ jobs:
     needs: generate-xcode-project
     runs-on: macos-15-xlarge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: Download xcode project file
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
         with:
           name: output-xcodeproj-file
           path: ./BucketeerOpenFeatureProvider.xcodeproj
