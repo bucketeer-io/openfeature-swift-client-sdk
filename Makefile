@@ -15,7 +15,10 @@ EXAMPLE_OPTIONS=\
 	-project $(APP_NAME).xcodeproj \
 	-scheme Example
 
-DESTINATION=-destination "name=$(DEVICE)"
+DESTINATION_IPHONE=-destination "name=$(DEVICE)"
+# Destination for iOS Simulator - using platform and name without specific OS version
+# This will match any available iPhone 16 simulator regardless of OS version
+DESTINATION=-destination 'platform=iOS Simulator,name=iPhone 16'
 
 CLEAN=rm -rf build
 SHOW_BUILD_SETTINGS=$(XCODEBUILD) $(BUILD_SETTINGS) $(OPTIONS) $(DESTINATION) \
